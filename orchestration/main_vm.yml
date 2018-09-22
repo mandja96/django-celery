@@ -148,7 +148,7 @@ resources:
     properties:
       count: {get_param: slaves_number}
       resource_def:
-        type: slave_vm.yml
+        type: slave_vm.yaml
         properties:
           private_network: {get_resource: main_network}
           name: milo_slave%index%

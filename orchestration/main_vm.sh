@@ -32,6 +32,9 @@ echo "PUBLIC KEY" > /home/ubuntu/.ssh/id_rsa.pub
 echo "Installing celery..."
 sudo -H pip install celery
 
+echo "Installing flower..."
+sudo -H pip install flower
+
 # echo "Installing flask..."
 # sudo -H pip install Flask
 
@@ -45,7 +48,7 @@ cd /home/ubuntu/milo-cloud/
 sudo git checkout master
 
 echo "Starting celery..."
-sudo screen -S celeryserver -d -m bash -c 'celery worker -A milotweet --autoscale=8,1'
+sudo screen -S celeryserver -d -m bash -c 'celery flower -A milotweet'
 
 echo "Starting django..."
 sudo python manage.py migrate

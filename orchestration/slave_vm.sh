@@ -25,9 +25,9 @@ cd /home/ubuntu/milo-cloud/
 sudo git checkout master
 
 echo "Connecting to the main rabbitmq node..."
-sed 's/localhost/MASTER_IP/' -i /home/ubuntu/acc-c3/milotweet/celery.py
+sed 's/localhost/MASTER_IP/' -i /home/ubuntu/milo-cloud/milotweet/celery.py
 
 echo "Starting celery..."
-sudo screen -S celeryserver -d -m bash -c 'celery worker -A milotweet --autoscale=8,1'
+sudo screen -S celeryserver -d -m bash -c 'celery worker -A milotweet -l info'
 
 echo "Initialization complete!"
