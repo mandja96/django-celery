@@ -1,0 +1,168 @@
+# openstack stack create -t main_vm.yml milo_stack
+# openstack stack list
+# openstack stack event list milo_stack
+# openstack stack delete milo_stack
+
+# openstack console log show milo_main
+
+
+heat_template_version: 2013-05-23
+
+description: Single tweet processing machine.
+
+# Parameters
+parameters:
+  image:
+    type: string
+    label: Image name or ID
+    description: Image to be used for compute instance
+    default: Ubuntu 16.04 LTS (Xenial Xerus) - latest
+
+  flavor:
+    type: string
+    label: Flavor
+    description: Type of instance (flavor) to be used
+    default: ssc.small
+
+  key:
+    type: string
+    label: Key name
+    description: Name of key-pair to be used for compute instance
+    default: milo_key
+
+  public_network:
+    type: string
+    label: Public network name or ID
+    description: Public network with floating IP addresses.
+    default: Public External IPv4 Network #Try network ID if this fails.
+
+  slaves_number:
+    type: number
+    label: Number of slaves
+    description: Number of slaves for counting pronouns. 
+    default: 2
+
+# Resources
+resources:
+
+  #networking
+  main_security_group:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      name: milo_networking
+      rules:
+        - protocol: icmp
+        - protocol: tcp
+          port_range_min: 22
+          port_range_max: 8000 #django; 5672 RabbitMQ
+
+  main_network:
+    type: OS::Neutron::Net
+
+  main_subnet:
+    type: OS::Neutron::Subnet
+    properties:
+      network_id: { get_resource: main_network }
+      cidr: 10.10.10.0/24
+      dns_nameservers: 
+      #There is a problem here with DNSs, VMs sometimes see internet, but not intranet names (so you must reffer to local things via IDs), or they see local names but do not know what e.g., www.google.com is, so you cannot update the packages or install anything from repos.
+        - 130.238.164.6
+        - 130.238.4.133
+        # - 130.238.7.10
+        # - 130.239.1.90
+        # - 129.16.1.53
+        - 8.8.8.8
+        - 8.8.4.4
+
+  main_router:
+    type: OS::Neutron::Router
+    properties:
+      external_gateway_info:
+        network: { get_param: public_network }
+
+  router_interface:
+    type: OS::Neutron::RouterInterface
+    properties:
+      router_id: { get_resource: main_router }
+      subnet: { get_resource: main_subnet }
+
+  main_port:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_resource: main_network }
+      security_groups:
+        - default
+        - { get_resource: main_security_group }
+
+  #private key
+  main_key:
+    type: OS::Nova::KeyPair
+    properties: 
+      save_private_key: true
+      name: main_key
+
+  #servers
+  main_server:
+    type: OS::Nova::Server
+    properties:
+      name: milo_main
+      image: { get_param: image }
+      flavor: { get_param: flavor }
+      key_name: { get_param: key }
+      networks:
+        - port: { get_resource: main_port }
+      user_data: 
+        str_replace:
+          template: {get_file: main_vm.sh}
+          params:
+            PRIVATE_KEY: {get_attr: [main_key, private_key]}
+            PUBLIC_KEY: {get_attr: [main_key, public_key]}
+      user_data_format: RAW
+
+  floating_ip:
+    type: OS::Neutron::FloatingIP
+    properties:
+      floating_network: { get_param: public_network }
+
+  floating_ip_assoc:
+    type: OS::Neutron::FloatingIPAssociation
+    properties:
+      floatingip_id: { get_resource: floating_ip }
+      port_id: { get_resource: main_port }
+
+  #volumes
+  milo_volume:
+    type: OS::Cinder::Volume
+    properties:
+      snapshot_id: 9d0cdfbe-7efb-479e-8979-9c0164facd25
+      
+  attach_milo_volume:
+    type: OS::Cinder::VolumeAttachment
+    properties:
+      volume_id: {get_resource: milo_volume}  
+      instance_uuid: { get_resource: main_server }
+
+  #slaves
+  slaves:
+    type: OS::Heat::ResourceGroup
+    properties:
+      count: {get_param: slaves_number}
+      resource_def:
+        type: slave_vm.yml
+        properties:
+          private_network: {get_resource: main_network}
+          name: milo_slave%index%
+          key: {get_resource: main_key}
+          master_ip: {
+            get_attr: [main_server, addresses, get_attr: [main_network, name], 0, addr]
+          }
+
+# Outputs
+outputs:
+  information:
+    description: Information
+    value: { get_attr: [main_server, show] }
+
+  floating_ip:
+    description: The floating IP address of the instance
+    value: { get_attr: [main_server, addresses, get_attr: [main_network, name], 1, addr] }

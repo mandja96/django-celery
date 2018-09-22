@@ -1,0 +1,151 @@
+<html>
+<head>
+    <title>MiloTweet</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>    
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js"></script>
+</head>
+
+<body style="text-align: center;">
+<h1>MiloTweet</h1>
+<br>
+
+<!-- <progress id="progress-bar" value="0" max="1" style="display:none; margin-bottom: 1em;">
+</progress>
+ -->
+
+<form id="generate-form" action="/count/" method="post">
+    {% csrf_token %}
+    {{ form }}
+    <input type="submit" value="Submit"/>
+</form>
+
+<div class="chart-container" style="position: relative; height:80vh; width:80vw; margin: auto">
+    <canvas id="myChart" width="" height=""></canvas>
+</div>
+
+
+<script type="text/javascript">
+    var frm = $('#generate-form');
+    // var pgrbar = $('#progress-bar');
+
+    var ctx = document.getElementById("myChart").getContext('2d');
+    var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ["Han", "Hon", "Den", "Det", "Denna", "Denne", "Hen"],
+            datasets: [{
+                label: ['# of pronouns'], 
+                data: [0, 0, 0, 0, 0, 0, 0],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)',
+                    'rgba(204, 254, 103, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255,99,132,1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)',
+                    'rgba(204, 254, 103, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero:true,
+                        min: 0,
+                        max: 300000
+                    }
+                }]
+            },
+            legend: {
+                display: false
+               
+            }
+        }
+    });
+
+    frm.submit(function () {
+        $.ajax({
+            type: frm.attr('method'),
+            url: frm.attr('action'),
+            data: frm.serialize(),
+            success: function (data) {
+                if (data.task_id[0] != null) {
+                	frm.html('');
+                    // pgrbar.css('display', 'inline');
+                    get_task_info(data.task_id);
+                }
+            },
+            error: function (data) {
+                console.log("The data were not received!");
+            }
+        });
+        return false;
+    });
+
+    function get_task_info(task_id) {
+        $.ajax({
+            type: 'get',
+            url: '/get-task-info/',
+            data: {'task_id': task_id},
+            success: function (data) {
+                var k = data.state.length;
+                var i; 
+
+                var new_task_id = [];
+                var n = 0;
+
+				for (i = 0; i < k; i++) {
+                    // RECEIVED, PENDING, STARTED    
+                    if (data.state[i] != 'SUCCESS') {
+                        new_task_id.push(task_id[i])
+     				}
+     				else if (data.state[i] == 'SUCCESS') {
+     					//frm.append("<br>" + JSON.stringify(data.result[i]));
+                        // n = 101 - k + i + 1;
+                        // pgrbar.val(Math.round((n / 101) * 100)); 
+                        //console.log(JSON.stringify(data.result[i]))
+                        //console.log(JSON.stringify(data.result[i]['han']))
+                       
+                        myChart.data.datasets[0].data[0] += data.result[i]['han'];
+                        myChart.data.datasets[0].data[1] += data.result[i]['hon'];
+                        myChart.data.datasets[0].data[2] += data.result[i]['den'];
+                        myChart.data.datasets[0].data[3] += data.result[i]['det'];
+                        myChart.data.datasets[0].data[4] += data.result[i]['denna'];
+                        myChart.data.datasets[0].data[5] += data.result[i]['denne'];
+                        myChart.data.datasets[0].data[6] += data.result[i]['hen'];
+                        
+                        myChart.update();
+                        // //frm.append("<br>" + JSON.stringify(data.result[i]));
+     				}
+                }   
+
+                task_id = new_task_id;
+                console.log(task_id.length);
+                if (task_id.length != 0) {
+                     setTimeout(function () {
+                        get_task_info(task_id);
+                     }, 150);
+                }
+                else {
+                    frm.append("Done!");
+                }
+            },
+            error: function (data) {
+                frm.html("No data!");
+            }
+        });
+    }
+</script>
+</body>
+</html>
