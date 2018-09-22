@@ -20,9 +20,9 @@ sudo -H pip install celery
 
 echo "Installing milo..."
 cd /home/ubuntu
-sudo git clone https://github.com/millovanovic/acc-c3.git
-cd /home/ubuntu/acc-c3/
-sudo git checkout stack
+sudo git clone https://github.com/mandja96/milo-cloud.git
+cd /home/ubuntu/milo-cloud/
+sudo git checkout master
 
 echo "Connecting to the main rabbitmq node..."
 sed 's/localhost/MASTER_IP/' -i /home/ubuntu/acc-c3/milotweet/celery.py

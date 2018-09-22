@@ -40,9 +40,9 @@ sudo -H pip install django
 
 echo "Installing milo..."
 cd /home/ubuntu
-sudo git clone https://github.com/millovanovic/acc-c3.git
-cd /home/ubuntu/acc-c3/
-sudo git checkout stack
+sudo git clone https://github.com/mandja96/milo-cloud.git
+cd /home/ubuntu/milo-cloud/
+sudo git checkout master
 
 echo "Starting celery..."
 sudo screen -S celeryserver -d -m bash -c 'celery worker -A milotweet --autoscale=8,1'
