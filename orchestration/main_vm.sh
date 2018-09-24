@@ -55,6 +55,6 @@ sudo screen -S celeryserver -d -m bash -c 'celery flower -A milotweet'
 
 echo "Starting django..."
 sudo python manage.py migrate
-sudo screen -S djangoserver -d -m bash -c 'python manage.py runserver'
+sudo screen -S djangoserver -d -m bash -c 'python manage.py runserver 0:8000'
 
 echo "Initialization complete!"
