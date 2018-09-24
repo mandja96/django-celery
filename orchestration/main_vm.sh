@@ -47,11 +47,14 @@ sudo git clone https://github.com/mandja96/milo-cloud.git
 cd /home/ubuntu/milo-cloud/
 sudo git checkout master
 
-echo "Starting celery..."
-sudo screen -S celeryserver -d -m bash -c 'celery flower -A milotweet'
+echo "Setting permission"
+sudo chown -R ubuntu.users /home/ubuntu/milo-cloud
+
+echo "Starting flower..."
+sudo screen -S celeryserver -d -m bash -c 'celery flower -A milotweet --port=8080'
 
 echo "Starting django..."
 sudo python manage.py migrate
-sudo screen -S djangoserver -d -m bash -c 'python manage.py runserver 0:8000'
+sudo screen -S djangoserver -d -m bash -c 'python manage.py runserver'
 
 echo "Initialization complete!"

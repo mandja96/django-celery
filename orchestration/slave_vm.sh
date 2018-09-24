@@ -18,16 +18,23 @@ sudo -H pip install numpy
 echo "Installing celery..."
 sudo -H pip install celery
 
+echo "Installing django..."
+sudo -H pip install django
+
 echo "Installing milo..."
 cd /home/ubuntu
 sudo git clone https://github.com/mandja96/milo-cloud.git
 cd /home/ubuntu/milo-cloud/
 sudo git checkout master
 
-echo "Connecting to the main rabbitmq node..."
-sed 's/localhost/MASTER_IP/' -i /home/ubuntu/milo-cloud/milotweet/celery.py
+echo "Setting permission"
+sudo chown -R ubuntu.users /home/ubuntu/milo-cloud
 
-echo "Starting celery..."
-sudo screen -S celeryserver -d -m bash -c 'celery worker -A milotweet -l info'
+echo "Connecting to the main rabbitmq node..."
+sudo sed 's/localhost/MASTER_IP/' -i /home/ubuntu/milo-cloud/milotweet/celery.py
+
+echo "Starting celery worker..."
+cd /home/ubuntu/milo-cloud/
+sudo screen -S celeryserver -d -m bash -c 'sudo -u ubuntu celery worker -A milotweet -l info'
 
 echo "Initialization complete!"
