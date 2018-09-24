@@ -8,8 +8,7 @@ from django.conf import settings
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'milotweet.settings')
 
 
-rabbitmq_url = 'milo_worker:milo@localhost/milo_vuser'
-app = Celery('milotweet', backend='amqp://' + rabbitmq_url, broker='amqp://' + rabbitmq_url)
+app = Celery('milotweet')
 
 
 

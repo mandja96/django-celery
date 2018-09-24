@@ -31,7 +31,7 @@ echo "Setting permission"
 sudo chown -R ubuntu.users /home/ubuntu/milo-cloud
 
 echo "Connecting to the main rabbitmq node..."
-sudo sed 's/localhost/MASTER_IP/' -i /home/ubuntu/milo-cloud/milotweet/celery.py
+sudo sed 's/localhost/MASTER_IP/' -i /home/ubuntu/milo-cloud/milotweet/settings.py
 
 echo "Starting celery worker..."
 cd /home/ubuntu/milo-cloud/
