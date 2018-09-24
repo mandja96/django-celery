@@ -51,7 +51,7 @@ echo "Setting permission"
 sudo chown -R ubuntu.users /home/ubuntu/milo-cloud
 
 echo "Starting flower..."
-sudo screen -S celeryserver -d -m bash -c 'celery flower -A milotweet --port=8080'
+sudo screen -S celeryserver -d -m bash -c 'celery flower -A milotweet'
 
 echo "Starting django..."
 sudo python manage.py migrate
