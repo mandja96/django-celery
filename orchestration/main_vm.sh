@@ -22,7 +22,7 @@ sudo service rabbitmq-server restart
 echo "Configuring rabbitmq..."
 sudo rabbitmqctl add_user milo_user milo
 sudo rabbitmqctl add_vhost milo_vuser
-sudo rabbitmqctl set_user_tags milo_user milotweet
+#sudo rabbitmqctl set_user_tags milo_user milotweet
 sudo set_permissions -p milo_vuser milo_user ".*" ".*" ".*"
 
 echo "Adding the SSH private key..."
@@ -55,6 +55,6 @@ sudo screen -S celeryserver -d -m bash -c 'celery flower -A milotweet'
 
 echo "Starting django..."
 sudo python manage.py migrate
-sudo screen -S djangoserver -d -m bash -c 'python manage.py runserver 0:8000'
+sudo screen -S djangoserver -d -m bash -c 'python manage.py runserver 0.0.0.0:8000'
 
 echo "Initialization complete!"
