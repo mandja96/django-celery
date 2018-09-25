@@ -24,7 +24,7 @@ echo "Configuring rabbitmq..."
 sudo rabbitmqctl add_user milo_user milo
 sudo rabbitmqctl add_vhost milo_vuser
 #sudo rabbitmqctl set_user_tags milo_user milotweet
-sudo set_permissions -p milo_vuser milo_user ".*" ".*" ".*"
+sudo rabbitmqctl set_permissions -p milo_vuser milo_user ".*" ".*" ".*"
 
 echo "Adding the SSH private key..."
 echo "PRIVATE_KEY" > /home/ubuntu/.ssh/id_rsa
