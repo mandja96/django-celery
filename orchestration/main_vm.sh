@@ -17,6 +17,7 @@ sudo -H pip install numpy
 
 echo "Installing rabbitmq..."
 sudo apt-get install -y rabbitmq-server
+#sudo service rabbitmq-server restart
 sudo service rabbitmq-server restart
 
 echo "Configuring rabbitmq..."
