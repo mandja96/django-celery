@@ -40,7 +40,7 @@ parameters:
     type: number
     label: Number of slaves
     description: Number of slaves for counting pronouns. 
-    default: 2
+    default: 4
 
 # Resources
 resources:
