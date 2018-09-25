@@ -120,8 +120,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-CELERY_BROKER_URL = "amqp://milo_worker:milo@localhost/milo_vuser"
-CELERY_RESULT_BACKEND = 'amqp://milo_worker:milo@localhost/milo_vuser'
+CELERY_BROKER_URL = "amqp://milo_user:milo@localhost/milo_vuser"
+CELERY_RESULT_BACKEND = 'amqp://milo_user:milo@localhost/milo_vuser'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
