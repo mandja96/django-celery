@@ -35,6 +35,7 @@ sudo sed 's/localhost/MASTER_IP/' -i /home/ubuntu/milo-cloud/milotweet/settings.
 
 echo "Starting celery worker..."
 cd /home/ubuntu/milo-cloud/
+sleep 5
 sudo screen -S celeryserver -d -m bash -c 'sudo -u ubuntu celery worker -A milotweet -l info'
 
 echo "Initialization complete!"
